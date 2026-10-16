@@ -1,0 +1,21 @@
+{
+  "id": "media-play-pause",
+  "name": "Media Key Play/Pause",
+  "version": "1.0.0",
+  "manifestURI": "https://raw.githubusercontent.com/faddix/media-play-pause/main/media-play-pause.json",
+  "language": "typescript",
+  "type": "plugin",
+  "description": "Maps physical keyboard media keys to the integrated player.",
+  "author": "Faddix",
+  "icon": "https://raw.githubusercontent.com/faddix/media-play-pause/main/assets/media-play-pause-icon.png",
+  "website": "https://github.com/faddix/media-play-pause",
+  "readme": "https://github.com/faddix/media-play-pause/blob/main/README.md",
+  "lang": "multi",
+  "payloadURI": "https://raw.githubusercontent.com/faddix/media-play-pause/main/media-play-pause.ts",
+  "plugin": {
+    "version": "1",
+    "permissions": {
+      "scopes": ["playback"]
+    }
+  }
+}

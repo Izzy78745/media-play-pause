@@ -11,7 +11,7 @@
   "website": "https://github.com/faddix/media-play-pause",
   "readme": "https://github.com/faddix/media-play-pause/blob/main/README.md",
   "lang": "multi",
-  "payloadURI": "https://raw.githubusercontent.com/faddix/media-play-pause/main/media-play-pause.ts",
+  "payloadURI": "https://raw.githubusercontent.com/Izzy78745/media-play-pause/refs/heads/main/media-play-pause.ts",
   "plugin": {
     "version": "1",
     "permissions": {

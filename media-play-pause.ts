@@ -3,68 +3,60 @@
 /// <reference path="./types/app.d.ts" />
 /// <reference path="./types/core.d.ts" />
 
-interface MediaKeyEvent {
-    key?: string;
-    code?: string;
-    repeat?: boolean;
-}
-
 function init(): void {
     $ui.register((ctx) => {
-        function getMediaAction(event: MediaKeyEvent): string | null {
-            const { key, code } = event;
-
-            if (
-                key === "MediaPlayPause" ||
-                key === "PlayPause" ||
-                code === "MediaPlayPause" ||
-                code === "PlayPause"
-            ) {
-                return "toggle";
-            }
-
-            if (key === "MediaPlay" || code === "MediaPlay") return "play";
-            if (key === "MediaPause" || code === "MediaPause") return "pause";
-            return null;
-        }
-
-        ctx.dom.onReady(() => {
-            // Attach a keydown listener to the body to handle media key events
-            ctx.dom.queryOne("body").then((body) => {
-                if (!body) {
-                    ctx.toast.error("Could not find the page body");
+        
+        function handlePlayback(action: "toggle" | "play" | "pause") {
+            try {
+                const status = ctx.videoCore.getPlaybackStatus();
+                if (!status?.id || !status.clientId || typeof status.paused !== "boolean") {
+                    ctx.toast.warning("No active video playback found");
                     return;
                 }
 
+                const shouldPause = action === "pause" || (action === "toggle" && !status.paused);
+
+                if (shouldPause && !status.paused) {
+                    ctx.videoCore.pause();
+                } else if (!shouldPause && status.paused) {
+                    ctx.videoCore.resume();
+                }
+            } catch (error) {
+                const message = `Media key playback control failed: ${String(error)}`;
+                ctx.toast.error(message);
+                console.error("Media Key Play/Pause: ", message);
+            }
+        }
+
+        ctx.dom.onReady(() => {
+            // 1. Keyboard event listener fallback
+            ctx.dom.queryOne("body").then((body) => {
+                if (!body) return;
                 body.addEventListener("keydown", (event) => {
-                    const action = getMediaAction(event);
-                    if (!action || event.repeat) return;
+                    const { key, code } = event;
+                    if (event.repeat) return;
 
-                    try {
-                        const status = ctx.videoCore.getPlaybackStatus();
-                        if (!status?.id || !status.clientId || typeof status.paused !== "boolean") {
-                            ctx.toast.warning("No active video playback found");
-                            return;
-                        }
-
-                        const shouldPause = action === "pause" || (action === "toggle" && !status.paused);
-
-                        if (shouldPause && !status.paused)
-                            ctx.videoCore.pause();
-                        else if (!shouldPause && status.paused)
-                            ctx.videoCore.resume();
-
-                    } catch (error) {
-                        const message = `Media key playback control failed: ${String(error)}`;
-                        ctx.toast.error(message);
-                        console.error("Media Key Play/Pause: ", message);
+                    if (key === "MediaPlayPause" || key === "PlayPause" || code === "MediaPlayPause" || code === "PlayPause") {
+                        handlePlayback("toggle");
+                    } else if (key === "MediaPlay" || code === "MediaPlay") {
+                        handlePlayback("play");
+                    } else if (key === "MediaPause" || code === "MediaPause") {
+                        handlePlayback("pause");
                     }
                 });
             }).catch((error: unknown) => {
-                const message = `Could not attach the key listener: ${String(error)}`;
-                ctx.toast.error(message);
-                console.error("Media Key Play/Pause: ", message);
+                console.error("Media Key Play/Pause keyboard fallback init failed: ", error);
             });
+
+            // 2. Browser Media Session listeners (Fixes OS-level mouse hardware commands)
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.setActionHandler("play", () => {
+                    handlePlayback("play");
+                });
+                navigator.mediaSession.setActionHandler("pause", () => {
+                    handlePlayback("pause");
+                });
+            }
         });
     });
 }

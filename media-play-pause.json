@@ -6,7 +6,7 @@
   "language": "typescript",
   "type": "plugin",
   "description": "Maps physical keyboard media keys to the integrated player.",
-  "author": "Faddix",
+  "author": "yabadabadoo",
   "icon": "https://raw.githubusercontent.com/faddix/media-play-pause/main/assets/media-play-pause-icon.png",
   "website": "https://github.com/faddix/media-play-pause",
   "readme": "https://github.com/faddix/media-play-pause/blob/main/README.md",

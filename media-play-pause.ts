@@ -30,7 +30,6 @@ function init(): void {
             }
         }
 
-        // Fix: Explicitly tell Windows/the browser that this app is actively playing media
         function updateMediaSessionState(isPaused: boolean) {
             if ("mediaSession" in navigator) {
                 navigator.mediaSession.playbackState = isPaused ? "paused" : "playing";
@@ -45,8 +44,7 @@ function init(): void {
                     const { key, code } = event;
                     if (event.repeat) return;
 
-                    // Expanded keys to catch generic mouse-emulated legacy break keys
-                    if (key === "MediaPlayPause" || key === "PlayPause" || code === "MediaPlayPause" || code === "PlayPause" || key === "Pause") {
+                    if (key === "MediaPlayPause" || key === "PlayPause" || code === "MediaPlayPause" || code === "MediaPlayPause" || key === "Pause") {
                         handlePlayback("toggle");
                     } else if (key === "MediaPlay" || code === "MediaPlay") {
                         handlePlayback("play");
@@ -60,7 +58,6 @@ function init(): void {
 
             // 2. Browser Media Session listeners (Fixes OS-level mouse hardware commands)
             if ("mediaSession" in navigator) {
-                // Set metadata to hijack Windows Focus from YouTube when your app is active
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: "App Stream",
                     artist: "Streaming Core"
@@ -73,14 +70,13 @@ function init(): void {
                     handlePlayback("pause");
                 });
                 
-                // Initialize state based on current core status if available
                 try {
                     const currentStatus = ctx.videoCore.getPlaybackStatus();
                     if (currentStatus && typeof currentStatus.paused === "boolean") {
                         updateMediaSessionState(currentStatus.paused);
                     }
                 } catch (e) {
-                    // Core might not be ready yet, updateMediaSessionState will handle it during play/pause events
+                    // Core might not be ready yet
                 }
             }
         });
